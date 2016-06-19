@@ -1,7 +1,10 @@
 # WundergroundLib
-Helper library to work with the Wunderground weather api. 
+Helper library to work with the Wunderground weather api, 
+especially in the context of using weather as feature for ML 
 
 Get your API Key here: https://www.wunderground.com/weather/api
+
+Nuget: https://www.nuget.org/packages/WundergroundLib/
 
 ##Usage
 ```cs
@@ -10,7 +13,6 @@ var stationId = wwfc.GetStationId("Germany", "Berlin");
 var forecast = wwfc.GetForecast(StationId);
 Console.WriteLine(JsonConvert.SerializeObject(forecast));
 ```
-
 ##Output
 ```json
 {
@@ -316,4 +318,4 @@ Console.WriteLine(JsonConvert.SerializeObject(forecast));
   }
 }
 ```
-Nuget: https://www.nuget.org/packages/WundergroundLib/
+

@@ -44,10 +44,12 @@ namespace WundergroundLib
     public class WundergroundWeatherForecast
     {
         private string apiKey;
+        private WebClient wc;
 
         public WundergroundWeatherForecast(string apiKey)
         {
             this.apiKey = apiKey;
+            wc = new WebClient();
         }
 
         private DateTime FromUnixTime(long unixTime)
@@ -109,9 +111,8 @@ namespace WundergroundLib
             return fc;
         }
 
-        private static JObject GetPredictionResponse(Uri uri)
+        private JObject GetPredictionResponse(Uri uri)
         {
-            WebClient wc = new WebClient();
             StreamReader sr = new StreamReader(wc.OpenRead(uri));
             return JObject.Parse(sr.ReadToEnd());
         }
