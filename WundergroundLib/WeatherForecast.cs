@@ -11,23 +11,23 @@ namespace WundergroundLib
 {
     public class DayForecast
     {
-        public int month;
-        public int day;
-        public int year;
+        public int? month;
+        public int? day;
+        public int? year;
         public string weekDay;
-        public int tempMin;
-        public int tempMax;
-        public int windAvg;
-        public int windMax;
-        public int rainTotal;
+        public int? tempMin;
+        public int? tempMax;
+        public int? windAvg;
+        public int? windMax;
+        public int? rainTotal;
     }
     public class HourForecast
     {
-        public int hour;
+        public int? hour;
         public DateTime timestamp;
-        public int temp;
-        public int wind;
-        public int rain;
+        public int? temp;
+        public int? wind;
+        public int? rain;
     }
 
     public class WeatherForecast
@@ -58,6 +58,12 @@ namespace WundergroundLib
             return epoch.AddSeconds(unixTime);
         }
 
+        private int? GetIntValue(JToken token, string key)
+        {
+            int value;
+            return Int32.TryParse(token.SelectToken(key).ToString(), out value) ? (int?) value : null;
+        }
+
         public string GetStationId(string country, string city)
         {
             Uri geoLookupUri = new Uri(
@@ -84,15 +90,15 @@ namespace WundergroundLib
             {
                 fc.Daily["T-" + fc.Daily.Count] = new DayForecast()
                 {
-                    day = Int32.Parse(token.SelectToken("date.day").ToString()),
-                    month = Int32.Parse(token.SelectToken("date.month").ToString()),
-                    year = Int32.Parse(token.SelectToken("date.year").ToString()),
+                    day = GetIntValue(token, "date.day"),
+                    month = GetIntValue(token, "date.month"),
+                    year = GetIntValue(token, "date.year"),
                     weekDay = token.SelectToken("date.weekday").ToString(),
-                    tempMin = Int32.Parse(token.SelectToken("low.celsius").ToString()),
-                    tempMax = Int32.Parse(token.SelectToken("high.celsius").ToString()),
-                    windAvg = Int32.Parse(token.SelectToken("avewind.kph").ToString()),
-                    windMax = Int32.Parse(token.SelectToken("maxwind.kph").ToString()),
-                    rainTotal = Int32.Parse(token.SelectToken("qpf_allday.mm").ToString())
+                    tempMin = GetIntValue(token, "low.celsius"),
+                    tempMax = GetIntValue(token, "high.celsius"),
+                    windAvg = GetIntValue(token, "avewind.kph"),
+                    windMax = GetIntValue(token, "maxwind.kph"),
+                    rainTotal = GetIntValue(token, "qpf_allday.mm")
                 };
             }
 
@@ -100,11 +106,11 @@ namespace WundergroundLib
             {
                 fc.Hourly["T-" + fc.Hourly.Count] = new HourForecast()
                 {
-                    hour = Int32.Parse(hourlyForecast.SelectToken("FCTTIME.hour")?.ToString()),
+                    hour = GetIntValue(hourlyForecast, "FCTTIME.hour"),
                     timestamp = FromUnixTime(Int64.Parse(hourlyForecast.SelectToken("FCTTIME.epoch")?.ToString())),
-                    temp = Int32.Parse(hourlyForecast.SelectToken("temp.metric")?.ToString()),
-                    wind = Int32.Parse(hourlyForecast.SelectToken("wspd.metric")?.ToString()),
-                    rain = Int32.Parse(hourlyForecast.SelectToken("qpf.metric")?.ToString()),
+                    temp = GetIntValue(hourlyForecast, "temp.metric"),
+                    wind = GetIntValue(hourlyForecast, "wspd.metric"),
+                    rain = GetIntValue(hourlyForecast, "qpf.metric")
                 };
             }
 
