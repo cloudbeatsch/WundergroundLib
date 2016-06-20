@@ -9,11 +9,20 @@ Nuget: https://www.nuget.org/packages/WundergroundLib/
 ##Usage
 ```cs
 var wwfc = new WundergroundWeatherForecast(WUNDERGROUND_API_KEY);
+
+// retrieve the stationId
 var stationId = wwfc.GetStationId("Germany", "Berlin");
-var forecast = wwfc.GetForecast(StationId);
+
+// get the raw response objects as JObject
+JObject dailyResp = GetResponse(DataFeatures.forecast, stationId);
+JObject hourlyResp = GetResponse(DataFeatures.hourly, stationId); 
+
+// get the forecast as a WeatherForecast object
+WeatherForecast forecast = wwfc.GetForecast(StationId);
 Console.WriteLine(JsonConvert.SerializeObject(forecast));
+
 ```
-##Output
+##Output of Console.WriteLine(JsonConvert.SerializeObject(forecast));
 ```json
 {
   "Daily": {

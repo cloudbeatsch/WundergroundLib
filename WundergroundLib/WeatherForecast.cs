@@ -9,6 +9,11 @@ using System.Threading.Tasks;
 
 namespace WundergroundLib
 {
+
+
+
+
+
     public class DayForecast
     {
         public int? month;
@@ -43,6 +48,48 @@ namespace WundergroundLib
     }
     public class WundergroundWeatherForecast
     {
+        public enum DataFeatures
+        {
+            alerts,
+            almanac,
+            astronomy,
+            conditions,
+            currenthurricane,
+            forecast,
+            forecast10day,
+            geolookup,
+            history,
+            hourly,
+            hourly10day,
+            planner,
+            rawtide,
+            satellite,
+            tide,
+            webcams,
+            yesterday
+        };
+
+        private Dictionary<DataFeatures, string> dataFeaturesUrlMap = new Dictionary<DataFeatures, string>()
+        {
+            { DataFeatures.alerts, "alerts" },
+            { DataFeatures.almanac, "almanac" },
+            { DataFeatures.astronomy, "astronomy" },
+            { DataFeatures.conditions, "conditions" },
+            { DataFeatures.currenthurricane, "currenthurricane" },
+            { DataFeatures.forecast, "forecast" },
+            { DataFeatures.forecast10day, "forecast10day" },
+            { DataFeatures.geolookup, "geolookup" },
+            { DataFeatures.history, "history" },
+            { DataFeatures.hourly, "hourly" },
+            { DataFeatures.hourly10day, "hourly10day" }, 
+            { DataFeatures.planner, "planner" }, 
+            { DataFeatures.rawtide, "rawtide" },
+            { DataFeatures.satellite, "satellite" },
+            { DataFeatures.tide, "tide" },
+            { DataFeatures.webcams, "webcams" },
+            { DataFeatures.yesterday, "yesterday" }
+        };
+
         private string apiKey;
         private WebClient wc;
 
@@ -68,23 +115,27 @@ namespace WundergroundLib
         {
             Uri geoLookupUri = new Uri(
                 string.Format("http://api.wunderground.com/api/{0}/geolookup/q/{1}/{2}.json", apiKey, country, city));
-            JObject geoLookupFCResponse = GetPredictionResponse(geoLookupUri);
+            JObject geoLookupFCResponse = GetServiceResponse(geoLookupUri);
 
             string stationId = geoLookupFCResponse.SelectToken("location.l").ToString();
             // e.g. /q/zmw:00000.1.10513 is the stationId for Köln
             return stationId;
         }
 
+        public JObject GetResponse(DataFeatures feature, string stationId)
+        {
+            Uri uri = new Uri(
+                string.Format("http://api.wunderground.com/api/{0}/{1}/q/zmw:{2}.json", apiKey, dataFeaturesUrlMap[feature], stationId));
+            return GetServiceResponse(uri);
+        }
         public WeatherForecast GetForecast(string stationId)
         {
             WeatherForecast fc = new WeatherForecast();
-            Uri hourlyUri = new Uri(
-                string.Format("http://api.wunderground.com/api/{0}/hourly/q/zmw:{1}.json", apiKey, stationId));
             Uri dailyUri = new Uri(
                 string.Format("http://api.wunderground.com/api/{0}/forecast/q/zmw:{1}.json", apiKey, stationId));
 
-            var dailyResp = GetPredictionResponse(dailyUri);
-            var hourlyResp = GetPredictionResponse(hourlyUri);
+            var dailyResp = GetResponse(DataFeatures.forecast, stationId);
+            var hourlyResp = GetResponse(DataFeatures.hourly, stationId); 
 
             foreach (var token in dailyResp.SelectToken("forecast.simpleforecast.forecastday"))
             {
@@ -117,7 +168,7 @@ namespace WundergroundLib
             return fc;
         }
 
-        private JObject GetPredictionResponse(Uri uri)
+        private JObject GetServiceResponse(Uri uri)
         {
             StreamReader sr = new StreamReader(wc.OpenRead(uri));
             return JObject.Parse(sr.ReadToEnd());
