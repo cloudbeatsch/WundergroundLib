@@ -6,7 +6,7 @@ Get your API Key here: https://www.wunderground.com/weather/api
 
 Nuget: https://www.nuget.org/packages/WundergroundLib/
 
-##Usage
+## Usage
 ```cs
 var wwfc = new WundergroundWeatherForecast(WUNDERGROUND_API_KEY);
 
@@ -22,7 +22,7 @@ WeatherForecast forecast = wwfc.GetForecast(StationId);
 Console.WriteLine(JsonConvert.SerializeObject(forecast));
 
 ```
-##Output of Console.WriteLine(JsonConvert.SerializeObject(forecast));
+## Output of Console.WriteLine(JsonConvert.SerializeObject(forecast));
 ```json
 {
   "Daily": {
